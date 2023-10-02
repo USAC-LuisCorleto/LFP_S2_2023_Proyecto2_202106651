@@ -4,6 +4,9 @@ class Token:
         self.type = type
         self.row = row
         self.column = column
-    
+        
     def print(self):
-        print("{:<15} {:<15} {:<5} {:<5}".format(self.lexeme, self.type, self.row, self.column))
+        print("{:<35} {:<35} {:<30} {:<25}".format(self.lexeme, self.type, self.row, self.column))
+
+    def sent(self):
+        return [self.lexeme, self.type, self.row, self.column]

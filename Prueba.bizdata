@@ -1,22 +1,20 @@
 Claves = [
-	"@@@@@_1", "clave_2", "clave_4", "#$%%_'"
+	"clave_1", "clave_2", "clave_3", "clave_4"
 ]
 
 Registros = [
-	{1, "producto_1", 20.00, 6}
-	{2, "producto_2", 5.75, 10}
-	{3, "producto_3", 100.99, 150}
-	{4, "producto_4", 5.75, 150}
-	{5, 1550, "Producto_5", 0.25, 12.85}
+	{1, "Barbacoa", 10.00, 20.00, 6}
+	{2, "Salsa", 11.00, 5.75, 10}
+	{3, "Mayonesa", 12.00, 100.99, 150}
+	{4, "Mostaza", 13.00, 5.75, 150}
+	{5, "Guacamol", 14.00, 0.25, 12.85}
 ]
 
-#
 # Este es un comentario
 
 '''
 	Comentario
-multi
-linea
+	multilínea
 '''
 
 imprimir("Reporte");
@@ -33,14 +31,10 @@ conteo();
 
 promedio("clave_4");
 
-' '
-'
+'''
 	Otro comentario
-multi
-linea
-'
-'
-	'
+	multilinea
+'''
 
 contarsi("clave_4", 5.75);
 

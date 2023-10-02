@@ -1,5 +1,5 @@
-from Token import Token
-from Error import Error
+from Clases.Token import Token
+from Clases.Error import Error
 
 class Léxico:
     def __init__(self):
@@ -18,7 +18,7 @@ class Léxico:
         self. temporary = ''
 
     def addError(self, character, row, column):
-        self.mistakesTable.append(Error('Caracter ' + character + ' no reconocido en el lenguaje.', row, column))
+        self.mistakesTable.append(Error('El carácter ' + character + ' no fue reconocido en el lenguaje.', row, column))
         self.temporary = ''
 
     def identifySymbol(self, character):
@@ -101,7 +101,7 @@ class Léxico:
                     self.column += 1
                 else:
                     if self.identifyReserved():
-                        self.addToken(self.temporary.strip(), "Instrucción de reportería", self.row, self.column)
+                        self.addToken(self.temporary.strip(), f"Instrucción - {self.temporary.strip()}", self.row, self.column)
                         self.state = 0
                         self.column += 1
                         i -=1
@@ -218,8 +218,8 @@ class Léxico:
     
     def printTokens(self):
         print("Tokens:")
-        print("{:<15} {:<15} {:<5} {:<5}".format("Lexeme", "Type", "Row", "Column"))
-        print("-" * 50)
+        print("{:<35} {:<35} {:<30} {:<25}".format("Lexema", "Tipo", "Fila", "Columna"))
+        print("-" * 100)
         for token in self.tokensTable:
             token.print()
 
