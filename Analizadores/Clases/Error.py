@@ -5,7 +5,7 @@ class Error:
         self.column = column
         
     def print(self):
-        print(self.description, self.column, self.row)
+        print("{:<50} {:<75} {:<55} {:<20}\n".format(self.description, self.column, self.row))
 
     def sent(self):
         return [self.description, self.column, self.row]

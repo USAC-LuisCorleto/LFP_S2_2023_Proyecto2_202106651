@@ -1,47 +1,40 @@
-Claves = [
-	"clave_1", "clave_2", "clave_3", "clave_4"
-]
-
-Registros = [
-	{1, "Barbacoa", 10.00, 20.00, 6}
-	{2, "Salsa", 11.00, 5.75, 10}
-	{3, "Mayonesa", 12.00, 100.99, 150}
-	{4, "Mostaza", 13.00, 5.75, 150}
-	{5, "Guacamol", 14.00, 0.25, 12.85}
-]
-
-# Este es un comentario
-
+# Comentario
 '''
 	Comentario
-	multilínea
-'''
-
-imprimir("Reporte");
-imprimir("Numero 1");
-
-imprimirln("Reporte");
-imprimirln("Numero 2");
-
-# Este es otro comentario
-
-sumar("clave_4");
-
-conteo();
-
-promedio("clave_4");
-
-'''
-	Otro comentario
 	multilinea
 '''
 
-contarsi("clave_4", 5.75);
+Claves = [
+	"codigo", "producto", "precio_compra", "precio_venta", "stock"
+]
+
+Registros = [ 
+	{1, "Barbacoa", 10.50, 20.00, 6}
+	{2, "Barbacoa", 13.00, 16.00, 7}
+	{3, "Mayonesa", 15.00, 18.00, 8}
+	{4, "Mostaza", 14.00, 16.00, 4}
+]
+
+imprimir("Reporte de ");
+imprimir("Abarrotería");
+
+imprimirln("Hola");
+imprimirln("y adiós");
+
+conteo();
+
+promedio("stock");
+
+contarsi("producto", "Barbacoa");
+contarsi("stock", 6);
+contarsi("stock", 8);
 
 datos();
 
-max("clave_4");
+sumar("stock");
 
-min("clave_5");
+max("precio_venta");
 
-exportarReporte("Titulo");
+min("precio_compra");
+
+exportarReporte("Reporte HTML de abarrotería");

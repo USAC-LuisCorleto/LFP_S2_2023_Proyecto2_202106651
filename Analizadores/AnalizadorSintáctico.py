@@ -4,6 +4,8 @@ from Instrucciones.Max import Max
 from Instrucciones.Min import Min
 from Instrucciones.Promedio import Promedio
 from Instrucciones.Suma import Suma
+from Reportes.ReporteHTML import reportHtml
+from prettytable import PrettyTable
 import uuid, copy
 
 class Sintáctico:
@@ -11,7 +13,7 @@ class Sintáctico:
         self.mistakes = mistakes
         self.tokens = tokens
         self.tokens.reverse()
-        self.reserved = ["Claves", "Registros", "imprimir", "imprimirln", "conteo", "promedio", "contarsi", "datos", "max", "min", "exportarReporte", "sumar", "puntoycoma"]
+        self.reserved = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE", "SUMAR", "PUNTO Y COMA"]
         self.vector = []
         self.keys = []
         self.functionContarSi = ContarSi()
@@ -19,6 +21,7 @@ class Sintáctico:
         self.functionMin = Min()
         self.functionPromedio = Promedio()
         self.functionSuma = Suma()
+        self.reportHTML = reportHtml()
         self.temporary = ""
         self.graph = Digraph('Arbol', format='png')
         self.start = ""
@@ -33,7 +36,7 @@ class Sintáctico:
 
     def addError(self, obtained, expected, row, column):
         self.mistakes.append(
-            "<ERROR SINTACTICO> Se obtuvo {}, se esperaba {}. Fila: {}, Columna: {}".format(
+            "[ERROR SINTÁCTICO] Encontrado: '{}', Se esperaba: '{}'. [Fila: {}, Columna: {}]".format(
                 obtained,
                 expected,
                 row,
@@ -46,34 +49,36 @@ class Sintáctico:
 
     def analyze(self):
         self.startAn()
+        self.impErrores()
         return(self.temporary, self.mistakes, self.graph)
     
     def startAn(self):
-        self.start = self.createNode('startAn')
+        self.start = self.createNode('Inicio')
         self.instructionsAn()
 
     def instructionsAn(self):
-        instruct = self.createNode('instructions')
-        self.addNodeC(self.start, instruct)
-        self.start = instruct
-        self.instructionAn()
-        self.instructionsAnode2()
+        instrucciones = self.createNode('Instrucciones')
+        self.addNodeC(self.start, instrucciones)
+        self.start = instrucciones
 
-    def instructionsAnode2(self):
+        self.instructionAn()
+        self.instructionsAn2()
+
+    def instructionsAn2(self):
         try:
             temp = self.tokens[-1]
             if temp.type.upper() in self.reserved:
                 self.instructionAn()
-                self.instructionsAnode2()
+                self.instructionsAn2()
             else:
                 self.addError(temp.type, "Instrucción", temp.row, temp.column)
                 self.instructionAn()
-                self.instructionsAnode2()
+                self.instructionsAn2()
         except IndexError:
             pass
         except Exception as e:
             print("Error en instructionsAnode2")
-            print(e)
+            print(f"Error {e}")
             pass
 
     def instructionAn(self):
@@ -81,7 +86,7 @@ class Sintáctico:
             temp = self.tokens[-1]
             if temp.type == 'imprimir':
                 self.printAn()
-            elif temp.tpye == 'imprimirln':
+            elif temp.type == 'imprimirln':
                 self.printlnAn()
             elif temp.type == 'Claves':
                 self.keysAn()
@@ -103,17 +108,20 @@ class Sintáctico:
                 self.minAn()
             elif temp.type == 'exportarReporte':
                 self.reportAn()
+            else:
+                pass
         except IndexError:
             pass
         except Exception as e:
             print("Error en instructionAn")
-            print(e)
+            print(f"Error {e}")
             pass
     
     def printAn(self):
         cadena = None
         temp = self.tokens.pop()
-        if temp.tpye == "imprimir":
+
+        if temp.type == "imprimir":
             printNd = temp.lexeme
             temp = self.tokens.pop()
 
@@ -178,12 +186,13 @@ class Sintáctico:
     def printlnAn(self):
         cadena = None
         temp = self.tokens.pop()
+
         if temp.type == "imprimirln":
             printNd = temp.lexeme
             temp = self.tokens.pop()
 
             if temp.type == "Paréntesis de apertura":
-                parentesisAp = temp.lexema
+                parentesisAp = temp.lexeme
                 temp = self.tokens.pop()
 
                 if temp.type == "Cadena":
@@ -191,7 +200,7 @@ class Sintáctico:
                     cadena = temp.lexeme
                     cadena = cadena.replace('"', '')
                     self.temporary += "\n" + cadena
-                    temp = self.tokens.pop
+                    temp = self.tokens.pop()
 
                     if temp.type == "Paréntesis de cierre":
                         parentesisCi = temp.lexeme
@@ -225,7 +234,7 @@ class Sintáctico:
                             self.start = nodeInstruction
                         else:
                             self.tokens.append(temp)
-                            self.addError(temp.tpye, "Punto y coma", temp.row, temp.column)
+                            self.addError(temp.type, "Punto y coma", temp.row, temp.column)
                     else:
                         self.tokens.append(temp)
                         self.addError(temp.type, "Paréntesis de cierre", temp.row, temp.column)
@@ -267,21 +276,20 @@ class Sintáctico:
                             else:
                                 self.tokens.append(temp)
                                 self.addError(temp.type, "Punto y coma - Corchete de cierre", temp.row, temp.column)
-
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Cadena", temp.row, temp.column)
                             break
-                    else:
-                        self.tokens.append(temp)
-                        self.addError(temp.type, "Corchete de cierre", temp.row, temp.column)
                 else:
                     self.tokens.append(temp)
-                    self.addError(temp.type, "Igual", temp.row, temp.column)
+                    self.addError(temp.type, "Corchete de apertura", temp.row, temp.column)
             else:
                 self.tokens.append(temp)
-                self.addError(temp.type, "Claves", temp.row, temp.column)
-            self.keys = rowTemp
+                self.addError(temp.type, "Igual", temp.row, temp.column)
+        else:
+            self.tokens.append(temp)
+            self.addError(temp.type, "Error", temp.row, temp.column)
+        self.keys = rowTemp
 
     def recordsAn(self):
         temp = self.tokens.pop()
@@ -358,10 +366,11 @@ class Sintáctico:
                         rows = len(self.vector)
                         columns = len(self.vector[0])
                         count = int(rows)*int(columns)
-                        self.temporary += "\n>>>" + str(count)
+                        self.temporary += "\nconteo()"
+                        self.temporary += "\n>>> " + str(count)
                         nodeInstruction = self.createNode('Instrucción')
                         node0 = self.createNode('conteo')
-                        node1 = self.createNode(count)
+                        node1 = self.createNode(str(count))
                         self.addNodeC(node0, node1)
                         node2 = self.createNode('Paréntesis de apertura')
                         node3 = self.createNode(parentesisAp)
@@ -420,7 +429,8 @@ class Sintáctico:
                             if res is None:
                                 print("Error")
                             else:
-                                self.temporary += "\n>>>" + res
+                                self.temporary += "\npromedio (" + cadenaLx + ")"
+                                self.temporary += "\n>>> " + res
                                 nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('promedio')
                                 node1 = self.createNode(average)
@@ -483,7 +493,7 @@ class Sintáctico:
 
                     if temp.type == "Coma":
                         comma = temp.lexeme
-                        temp = self.tokens.pop()
+                        temp = self.tokens.pop()                         
 
                         if temp.type == "Cadena" or temp.type == "Decimal" or temp.type == "Entero":
                             value = temp.lexeme
@@ -499,7 +509,8 @@ class Sintáctico:
                                     if res is None:
                                         print("Error en contarSi")
                                     else:
-                                        self.temporary += "\n>>>" + res
+                                        self.temporary += "\ncontarsi(" + cadena1 + "," + cadena2 + ")"
+                                        self.temporary += "\n>>> " + res
                                         nodeInstruction = self.createNode('Instrucción')
                                         node0 = self.createNode('contarsi')
                                         node1 = self.createNode(contarsi)
@@ -533,7 +544,6 @@ class Sintáctico:
                                         self.addNodeC(self.start, nodeInstruction)
                                         self.addNodeC(nodeInstruction, node14)
                                         self.start = nodeInstruction
-
                                 else:
                                     self.tokens.append(temp)
                                     self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -572,6 +582,7 @@ class Sintáctico:
                     temp = self.tokens.pop()
 
                     if temp.type == "Punto y coma":
+                        self.impTabla()
                         nodeInstruction = self.createNode('Instrucción')
 
                         node0 = self.createNode('datos')
@@ -599,7 +610,7 @@ class Sintáctico:
                         self.addNodeC(self.start, nodeInstruction)
                         self.addNodeC(nodeInstruction, node8)
                         self.start = nodeInstruction
-                    
+                        pass
                     else:
                         self.tokens.append(temp)
                         self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -639,7 +650,8 @@ class Sintáctico:
                             if res is None:
                                 print("Error en suma")
                             else:
-                                self.temporary += "\n>>>" + res
+                                self.temporary += "\nsumar (" + cadenaLx + ")"
+                                self.temporary += "\n>>> " + res
                                 nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('sumar')
                                 node1 = self.createNode(sum)
@@ -707,7 +719,8 @@ class Sintáctico:
                             if res is None:
                                 print("Error en max")
                             else:
-                                self.temporary += "\n>>>" + res
+                                self.temporary += "\nmax (" + cadenaLx + ")"
+                                self.temporary += "\n>>> " + res
                                 nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('max')
                                 node1 = self.createNode(maximum)
@@ -774,7 +787,8 @@ class Sintáctico:
                             if res is None:
                                 print("Error en min")
                             else:
-                                self.temporary += "\n>>>" + res
+                                self.temporary += "\nmin (" + cadenaLx + ")"
+                                self.temporary += "\n>>> " + res
                                 nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('min')
                                 node1 = self.createNode(minimum)
@@ -817,4 +831,86 @@ class Sintáctico:
             self.addError(temp.type, "min", temp.row, temp.column)
 
     def reportAn(self):
-        pass
+        cadena = None
+        temp = self.tokens.pop()
+
+        if temp.type == "exportarReporte":
+            report = temp.lexeme
+            temp = self.tokens.pop()
+
+            if temp.type == "Paréntesis de apertura":
+                parentesisAp = temp.lexeme
+                temp = self.tokens.pop()
+
+                if temp.type == "Cadena":
+                    cadena = temp.lexeme
+                    cadenaLx = temp.lexeme
+                    temp = self.tokens.pop()
+
+                    if temp.type == "Paréntesis de cierre":
+                        parentesisCi = temp.lexeme
+                        temp = self.tokens.pop()
+
+                        if temp.type == "Punto y coma":
+                            report = self.reportHTML.reportHTML(cadena, self.keys, self.vector)
+                            self.temporary += report
+                            nodeInstruction = self.createNode('Instrucción')
+                            node0 = self.createNode('exportarReporte')
+                            node1 = self.createNode(report)
+                            self.addNodeC(node0, node1)
+                            node2 = self.createNode('Paréntesis de apertura')
+                            node3 = self.createNode(parentesisAp)
+                            self.addNodeC(node2, node3)
+                            node4 = self.createNode('Cadena')
+                            node5 = self.createNode(cadenaLx)
+                            self.addNodeC(node4, node5)
+                            node6 = self.createNode('Paréntesis de cierre')
+                            node7 = self.createNode(parentesisCi)
+                            self.addNodeC(node6, node7)
+                            node8 = self.createNode('Punto y coma')
+                            node9 = self.createNode(temp.lexeme)
+                            self.addNodeC(node8, node9)
+                            node10 = self.createNode('Instrucción - exportarReporte')
+                            self.addNodeC(node10, node0)
+                            self.addNodeC(node10, node2)
+                            self.addNodeC(node10, node4)
+                            self.addNodeC(node10, node6)
+                            self.addNodeC(node10, node8)
+                            self.addNodeC(self.start, nodeInstruction)
+                            self.addNodeC(nodeInstruction, node10)
+                            self.start = nodeInstruction
+                        else:
+                            self.tokens.append(temp)
+                            self.addError(temp.type, "Punto y coma", temp.row, temp.column)
+                    else:
+                        self.tokens.append(temp)
+                        self.addError(temp.type, "Paréntesis de cierre", temp.row, temp.column)
+                else:
+                    self.tokens.append(temp)
+                    self.addError(temp.type, "Cadena", temp.row, temp.column)
+            else:
+                self.tokens.append(temp)
+                self.addError(temp.type, "Paréntesis de apertura", temp.row, temp.column)
+        else:
+            self.tokens.append(temp)
+            self.addError(temp.type, "exportarReporte", temp.row, temp.column)
+    
+    def impTabla(self):
+        table = PrettyTable()
+        table.field_names = self.keys
+        if len(self.vector)==0:
+            print('No hay valores en la tabla.')
+        else:
+            for value in self.vector:
+                table.add_row(value)
+            self.temporary += "\n" + str(table)
+
+    def impErrores(self):
+        table = PrettyTable()
+        table.field_names = ["Errores"]
+        if len(self.mistakes)==0:
+            print('No hay errores en la lista.')
+        else:
+            for value in self.mistakes:
+                table.add_row([value])
+            self.temporary += "\n" + str(table)

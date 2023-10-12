@@ -1,5 +1,6 @@
 from Clases.Token import Token
 from Clases.Error import Error
+from prettytable import PrettyTable
 
 class Léxico:
     def __init__(self):
@@ -11,7 +12,8 @@ class Léxico:
         self.state = 0
         self.mistakes = []
         self.symbols = [";", ",", "=", "{", "}", "[", "]", "(", ")"]
-        self.reserved = ["Claves", "Registros", "imprimir", "imprimirln", "conteo", "promedio", "contarsi", "datos", "max", "min", "exportarReporte", "sumar"]
+        self.reserved = ["CLAVES", "REGISTROS", "IMPRIMIR", "IMPRIMIRLN", "CONTEO", "PROMEDIO", "CONTARSI", "DATOS", "MAX", "MIN", "EXPORTARREPORTE", "SUMAR"]
+        self.i = 0
 
     def addToken(self, character, token, row, column):
         self.tokensTable.append(Token(character, token, row, column))
@@ -20,6 +22,14 @@ class Léxico:
     def addError(self, character, row, column):
         self.mistakesTable.append(Error('El carácter ' + character + ' no fue reconocido en el lenguaje.', row, column))
         self.temporary = ''
+
+        self.mistakes.append(
+            "<ERROR LEXICO> Caracter {} no reconocido en el lenguaje. Fila: {}, Columna: {}".format(
+                character,
+                row,
+                column
+            )
+        )
 
     def identifySymbol(self, character):
         if character == ';':
@@ -31,7 +41,7 @@ class Léxico:
         elif character == '{':
             self.addToken(str(character), "Llave de apertura", self.row, self.column)
         elif character == '}':
-            self.addToken(str(character), "Llav de cierre", self.row, self.column)
+            self.addToken(str(character), "Llave de cierre", self.row, self.column)
         elif character == '[':
             self.addToken(str(character), "Corchete de apertura", self.row, self.column)
         elif character == ']':
@@ -45,7 +55,7 @@ class Léxico:
         self.column += 1
 
     def identifyReserved(self):
-        if self.temporary in self.reserved:
+        if self.temporary.upper() in self.reserved:
             return True
         else:
             return False
@@ -53,71 +63,78 @@ class Léxico:
     def analyzer(self, cadena):
         self.tokensTable = []
         self.mistakesTable = []
-        i = 0
+        self.i = 0
 
-        while i < len(cadena):
+        while self.i < len(cadena):
             if self.state == 0:
-                if cadena[i].isalpha():
-                    self.temporary += cadena[i]
+                if cadena[self.i].isalpha():
+                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 1
                 
-                elif cadena[i].isdigit():
-                    self.temporary += cadena[i]
+                elif cadena[self.i].isdigit():
+                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 2
 
-                elif cadena[i] in self.symbols:
-                    self.identifySymbol(cadena[i])
+                elif cadena[self.i] in self.symbols:
+                    self.identifySymbol(cadena[self.i])
                 
-                elif cadena[i] == '"':
-                    self.temporary += cadena[i]
+                elif cadena[self.i] == '"':
+                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 5
 
-                elif cadena[i] == '#':
+                elif cadena[self.i] == '#':
+                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 7
 
-                elif cadena[i] == "'":
-                    self.temporary += cadena[i]
+                elif cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 9
                 
-                elif cadena[i] == '\n':
+                elif cadena[self.i] == '\n':
                     self.row += 1
                     self.column = 1
 
-                elif cadena[i] == '\r':
+                elif cadena[self.i] in ['\t', ' ']:
+                    self.column += 1
+
+                elif cadena[self.i] == '\r':
                     pass
 
                 else:
-                    self.temporary += cadena[i]
+                    self.temporary += cadena[self.i]
                     self.addError(self.temporary, self.row, self.column)
+                    print("Else estado 0")
                     self.column += 1
+
             elif self.state == 1:
-                if cadena[i].isalpha():
-                    self.temporary += cadena[i]
+                if cadena[self.i].isalpha():
+                    self.temporary += cadena[self.i]
                     self.column += 1
                 else:
                     if self.identifyReserved():
-                        self.addToken(self.temporary.strip(), f"Instrucción - {self.temporary.strip()}", self.row, self.column)
+                        self.addToken(self.temporary.strip(), self.temporary.strip(), self.row, self.column)
                         self.state = 0
                         self.column += 1
-                        i -=1
+                        self.i -=1
                     else:
                         self.addError(self.temporary, self.row, self.column)
                         self.state = 0
+                        print("Else estado 1")
                         self.column += 1
-                        i -= 1
+                        self.i -= 1
 
             elif self.state == 2:
-                if cadena[i].isdigit():
-                    self.temporary += cadena[i]
+                if cadena[self.i].isdigit():
+                    self.temporary += cadena[self.i]
                     self.column += 1
 
-                elif cadena[i] == ".":
-                    self.temporary += cadena[i]
+                elif cadena[self.i] == ".":
+                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 3
 
@@ -125,30 +142,30 @@ class Léxico:
                     self.addToken(self.temporary, 'Entero', self.row, self.column)
                     self.state = 0
                     self.column += 1
-                    i -= 1
+                    self.i -= 1
 
             elif self.state == 3:
-                if cadena[i].isdigit():
-                    self.temporary += cadena[i]
+                if cadena[self.i].isdigit():
+                    self.temporary += cadena[self.i]
                     self.column += 1
                 else:
                     self.addToken(self.temporary, 'Decimal', self.row, self.column)
                     self.state = 0
                     self.column += 1
-                    i -= 1
+                    self.i -= 1
             
             elif self.state == 5:
-                if cadena[i] != "\"":
-                    self.temporary += cadena[i]
+                if cadena[self.i] != "\"":
+                    self.temporary += cadena[self.i]
                     self.column += 1
                 else:
-                    self.temporary += cadena[i]
+                    self.temporary += cadena[self.i]
                     self.addToken(self.temporary, "Cadena", self.row, self.column)
                     self.state = 0
                     self.column += 1
 
             elif self.state == 7:
-                if cadena[i] == '\n':
+                if cadena[self.i] == '\n':
                     self.state = 0
                     self.row += 1
                     self.column = 1
@@ -156,53 +173,53 @@ class Léxico:
                     self.column += 1
 
             elif self.state == 9:
-                if cadena[i] == "'":
-                    self.temporary += cadena[i]
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
                     self.state = 10
                     self.column += 1
                 else:
                     self.addError(self.temporary, self.row, self.column)
                     self.state = 0
                     self.column += 1
-                    i -= 1
+                    self.i -= 1
 
             elif self.state == 10:
-                if cadena[i] == "'":
-                    self.temporary += cadena[i]
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
                     self.state = 11
                     self.column += 1
                 else:
                     self.addError(self.temporary, self.row, self.column)
                     self.state = 0
                     self.column += 1
-                    i -= 1
+                    self.i -= 1
             
             elif self.state == 11:
-                if cadena[i] == "'":
-                    self.temporary += cadena[i]
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
                     self.state = 12
                     self.column += 1
-                elif cadena[i] == '\n':
-                    self.temporary += cadena[i]
+                elif cadena[self.i] == '\n':
+                    self.temporary += cadena[self.i]
                     self.row += 1
                     self.column = 1
                 else:
-                    self.temporary += cadena[i]
+                    self.temporary += cadena[self.i]
                     self.column += 1
             
             elif self.state == 12:
-                if cadena[i] == "'":
-                    self.temporary += cadena[i]
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
                     self.state = 13
                     self.column += 1
                 else:
                     self.addError(self.temporary, self.row, self.column)
                     self.state = 0
                     self.column += 1
-                    i -= 1
+                    self.i -= 1
 
             elif self.state == 13:
-                if cadena[i] == "'":
+                if cadena[self.i] == "'":
                     self.temporary = ""
                     self.state = 0
                     self.column += 1
@@ -210,21 +227,31 @@ class Léxico:
                     self.addError(self.temporary, self.row, self.column)
                     self.state = 0
                     self.column += 1
-                    i -= 1
+                    self.i -= 1
 
-            i += 1
-        res = [self.tokensTable, self.mistakesTable]
-        return res
+            self.i += 1
+        return self.tokensTable, self.mistakes
     
     def printTokens(self):
-        print("Tokens:")
-        print("{:<35} {:<35} {:<30} {:<25}".format("Lexema", "Tipo", "Fila", "Columna"))
-        print("-" * 100)
+        print("-" * 175)
+        print("{:<50} {:<75} {:<55} {:<20}".format("Lexema", "Tipo", "Fila", "Columna"))
+        print("-" * 175)
         for token in self.tokensTable:
             token.print()
 
-autom = Léxico()
-with open('Prueba.bizdata', 'r') as archivo:
-    contenido = archivo.read()
-autom.analyzer(contenido)
-autom.printTokens()
+    def impTokens(self):
+        x = PrettyTable()
+        x.field_names = ["Lexema", "Token", "Fila", "Columna"]
+        for i in self.tokensTable:
+            x.add_row(i.sent())
+        print(x)
+
+    def impErrores(self):
+        x = PrettyTable()
+        x.field_names = ["Descripcion", "Fila", "Columna"]
+        if len(self.mistakesTable)==0:
+            print('No hay errores')
+        else:
+            for i in self.mistakesTable:
+                x.add_row(i.sent())
+            print(x)

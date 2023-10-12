@@ -3,8 +3,9 @@ class ContarSi:
         cadena = field.replace('"', '')
         count = 0
         large = len(records)
-        for value in keys:
-            if str(value) == str(cadena):
+
+        for valu in keys:
+            if str(valu) == str(cadena):
                 suma = 0
                 i = 0
                 while large>i:
