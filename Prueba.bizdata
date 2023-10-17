@@ -3,7 +3,7 @@
 	Comentario
 	multilinea
 '''
-
++
 Claves = [
 	"codigo", "producto", "precio_compra", "precio_venta", "stock"
 ]
@@ -38,3 +38,8 @@ max("precio_venta");
 min("precio_compra");
 
 exportarReporte("Reporte HTML de abarrotería");
+-
+contarsi(;
+
+
+

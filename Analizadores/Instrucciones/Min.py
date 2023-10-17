@@ -1,17 +1,11 @@
 class Min:
     def min(self, records, keys, field):
-        cadena = field.replace('"', '')
-        count = 0
-        min = float('inf')
-        large = len(records)
+        field = field.replace('"', '')
 
-        for value in keys:
-            if value == cadena:
-                i = 0
-                while large>i:
-                    if float(records[i][count]) < min:
-                        min = float(records[i][count])
-                    i += 1
-                return str(min)
-            count += 1
-        return None
+        try:
+            index = keys.index(field)
+        except ValueError:
+            return None
+
+        min_value = min(float(record[index]) for record in records)
+        return str(min_value)

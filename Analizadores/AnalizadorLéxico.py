@@ -1,6 +1,5 @@
 from Clases.Token import Token
 from Clases.Error import Error
-from prettytable import PrettyTable
 
 class Léxico:
     def __init__(self):
@@ -22,14 +21,7 @@ class Léxico:
     def addError(self, character, row, column):
         self.mistakesTable.append(Error('El carácter ' + character + ' no fue reconocido en el lenguaje.', row, column))
         self.temporary = ''
-
-        self.mistakes.append(
-            "<ERROR LEXICO> Caracter {} no reconocido en el lenguaje. Fila: {}, Columna: {}".format(
-                character,
-                row,
-                column
-            )
-        )
+        self.mistakes.append(f"[ERROR LÉXICO] Caracter: '{character}' no fue reconocido en el lenguaje. Fila: '{row}', Columna: '{column}'")
 
     def identifySymbol(self, character):
         if character == ';':
@@ -240,18 +232,14 @@ class Léxico:
             token.print()
 
     def impTokens(self):
-        x = PrettyTable()
-        x.field_names = ["Lexema", "Token", "Fila", "Columna"]
+        print("Lexema\tToken\tFila\tColumna")
         for i in self.tokensTable:
-            x.add_row(i.sent())
-        print(x)
+            print("\t".join(map(str, i.sent())))
 
     def impErrores(self):
-        x = PrettyTable()
-        x.field_names = ["Descripcion", "Fila", "Columna"]
-        if len(self.mistakesTable)==0:
+        if len(self.mistakesTable) == 0:
             print('No hay errores')
         else:
+            print("Descripcion\tFila\tColumna")
             for i in self.mistakesTable:
-                x.add_row(i.sent())
-            print(x)
+                print("\t".join(map(str, i.sent())))

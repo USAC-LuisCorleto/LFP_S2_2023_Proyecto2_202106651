@@ -1,17 +1,11 @@
 class Max:
     def max(self, records, keys, field):
-        cadena = field.replace('"', '')
-        count = 0
-        max = 0
-        large = len(records)
-
-        for value in keys:
-            if value == cadena:
-                i = 0
-                while large>i:
-                    if float(records[i][count]) > max:
-                        max = float(records[i][count])
-                    i += 1
-                return str(max)
-            count += 1
-        return None
+        field = field.replace('"', '')
+        
+        try:
+            index = keys.index(field)
+        except ValueError:
+            return None
+        
+        max_value = max(float(record[index]) for record in records)
+        return str(max_value)

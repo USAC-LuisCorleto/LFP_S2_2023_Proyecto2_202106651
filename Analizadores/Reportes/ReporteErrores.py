@@ -1,22 +1,19 @@
 import os
 
-class reportHtml:
+class reportMistakes():
     def __init__(self):
         pass
 
-    def reportHTML(self, title, records, keys):
-        title = title.strip('"')
-        html = """<!DOCTYPE html>
+    def reportMistakes(self, mistakesTable):
+        html =  """<!doctype html>
                     <html lang="en">
                     <head>
+                    <!-- Required meta tags -->
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                    <title>Reporte</title>
 
                     <!-- Bootstrap CSS -->
-                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-                    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
                     <style>
                         body {
                             margin: 20px;
@@ -42,33 +39,37 @@ class reportHtml:
                             text-align: center;
                             padding: 8px;
                         }
-                    
                     </style>
-                    
+
+                    <title>Reportes</title>
                     </head>
                     <body>
-                    <h1>""" + str(title) + """</h1>
+                
+                    &nbsp;
+                    <h1 style="text-align: center;">Reporte de Errores</h1>
+                    &nbsp;                    
 
                     <table class="table table-hover table-dark">
                     <thead>
-                    <tr>"""
-        for record in records:
-            html += '<th>' + str(record) + '</th>'
-        html += """ </tr>
+                    <tr style="height: 18px;">
+                    <th><strong>Error</strong></th>
+                    </tr>
                     </thead>
                     <tbody>
                     """
-        for row in keys:
-            html += """<tr>"""
-            for column in row:
-                html += """<td>""" + str(column) + """</td>"""
-            html += """</tr>"""
-        html += """ </tbody>
-                    </table>
-                    </body>
-                    </html>"""
+
+        for error in mistakesTable:
+            
+            html += """<tr style="height: 18px;">
+                    <td>""" + str(error).replace("<", "&#60;").replace(">", "&#62;") +"""</span></td>
+                    </tr>"""
+        html += """ 
+                </tbody>
+                </table>
+                <p>&nbsp;</p>
+        """
         current_dir = os.getcwd()
-        file_path = os.path.join(current_dir, "exportarReporte.html")
+        file_path = os.path.join(current_dir, "Errores.html")
         with open(file_path, "w+", encoding="utf-8") as archivo:
             archivo.write(html)
         abs_file_path = os.path.abspath(file_path)

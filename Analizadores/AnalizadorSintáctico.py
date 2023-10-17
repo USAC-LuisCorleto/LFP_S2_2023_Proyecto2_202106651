@@ -23,26 +23,21 @@ class Sintáctico:
         self.functionSuma = Suma()
         self.reportHTML = reportHtml()
         self.temporary = ""
-        self.graph = Digraph('Arbol', format='png')
+        self.graph = Digraph('Arbol de derivación', format='png')
+        self.graph.attr(bgcolor='lightyellow', fontname='Arial', fontsize='12', rankdir='TB')
         self.start = ""
+        self.nodeInstruction = ""
 
     def createNode(self, tag:str) -> str:
         id = str(uuid.uuid1())
-        self.graph.node(id,tag)
+        self.graph.node(id, tag, shape='box', style='filled', color='lightblue')
         return id
     
     def addNodeC(self, parentNode, childNode:str):
-        self.graph.edge(parentNode, childNode)
+        self.graph.edge(parentNode, childNode, color='red', penwidth='2.0')
 
     def addError(self, obtained, expected, row, column):
-        self.mistakes.append(
-            "[ERROR SINTÁCTICO] Encontrado: '{}', Se esperaba: '{}'. [Fila: {}, Columna: {}]".format(
-                obtained,
-                expected,
-                row,
-                column
-            ) 
-        )
+        self.mistakes.append(f"[ERROR SINTÁCTICO] Encontrado: '{obtained}', Se esperaba: '{expected}'. [Fila: {row}, Columna: {column}")
         temp = self.tokens[-1]
         while temp.type.upper() not in self.reserved:
             temp = self.tokens.pop()
@@ -54,12 +49,14 @@ class Sintáctico:
     
     def startAn(self):
         self.start = self.createNode('Inicio')
+        self.nodeInstruction = self.createNode('Instrucción')
         self.instructionsAn()
 
     def instructionsAn(self):
         instrucciones = self.createNode('Instrucciones')
         self.addNodeC(self.start, instrucciones)
         self.start = instrucciones
+        self.addNodeC(self.start, self.nodeInstruction)
 
         self.instructionAn()
         self.instructionsAn2()
@@ -141,7 +138,6 @@ class Sintáctico:
                         temp = self.tokens.pop()
 
                         if temp.type == "Punto y coma":
-                            nodeInstruction = self.createNode('Instrucción')
                             node0 = self.createNode('imprimir')
                             node10 = self.createNode(printNd)
                             self.addNodeC(node0, node10)
@@ -163,10 +159,7 @@ class Sintáctico:
                             self.addNodeC(node9, node3)
                             self.addNodeC(node9, node5)
                             self.addNodeC(node9, node7)
-                            self.addNodeC(self.start, nodeInstruction)
-                            self.addNodeC(nodeInstruction, node9)
-                            self.start = nodeInstruction
-
+                            self.addNodeC(self.nodeInstruction, node9)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -207,7 +200,6 @@ class Sintáctico:
                         temp = self.tokens.pop()
 
                         if temp.type == "Punto y coma":
-                            nodeInstruction = self.createNode('Instrucción')
                             node0 = self.createNode('imprimirln')
                             node2 = self.createNode(printNd)
                             self.addNodeC(node0, node2)
@@ -229,9 +221,7 @@ class Sintáctico:
                             self.addNodeC(node11, node5)
                             self.addNodeC(node11, node7)
                             self.addNodeC(node11, node9)
-                            self.addNodeC(self.start, nodeInstruction)
-                            self.addNodeC(nodeInstruction, node11)
-                            self.start = nodeInstruction
+                            self.addNodeC(self.nodeInstruction, node11)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -368,7 +358,6 @@ class Sintáctico:
                         count = int(rows)*int(columns)
                         self.temporary += "\nconteo()"
                         self.temporary += "\n>>> " + str(count)
-                        nodeInstruction = self.createNode('Instrucción')
                         node0 = self.createNode('conteo')
                         node1 = self.createNode(str(count))
                         self.addNodeC(node0, node1)
@@ -381,15 +370,12 @@ class Sintáctico:
                         node7 = self.createNode('Punto y coma')
                         node8 = self.createNode(temp.lexeme)
                         self.addNodeC(node7, node8)
-                        node9 = self.createNode('Instrucción - conteo')
+                        node9 = self.createNode('Instrucción - conteo()')
                         self.addNodeC(node9, node0)
-                        self.addNodeC(node9, node9)
-                        self.addNodeC(node9, node5)
+                        self.addNodeC(node9, node2)
+                        self.addNodeC(node9, node4)
                         self.addNodeC(node9, node7)
-                        self.addNodeC(self.start, nodeInstruction)
-                        self.addNodeC(nodeInstruction, node9)
-                        self.start = nodeInstruction
-                    
+                        self.addNodeC(self.nodeInstruction, node9)                    
                     else:
                         self.tokens.append(temp)
                         self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -431,7 +417,6 @@ class Sintáctico:
                             else:
                                 self.temporary += "\npromedio (" + cadenaLx + ")"
                                 self.temporary += "\n>>> " + res
-                                nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('promedio')
                                 node1 = self.createNode(average)
                                 self.addNodeC(node0, node1)
@@ -453,10 +438,7 @@ class Sintáctico:
                                 self.addNodeC(node10, node4)
                                 self.addNodeC(node10, node6)
                                 self.addNodeC(node10, node8)
-                                self.addNodeC(self.start, nodeInstruction)
-                                self.addNodeC(nodeInstruction, node10)
-                                self.start = nodeInstruction
-
+                                self.addNodeC(self.nodeInstruction, node10)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -511,7 +493,6 @@ class Sintáctico:
                                     else:
                                         self.temporary += "\ncontarsi(" + cadena1 + "," + cadena2 + ")"
                                         self.temporary += "\n>>> " + res
-                                        nodeInstruction = self.createNode('Instrucción')
                                         node0 = self.createNode('contarsi')
                                         node1 = self.createNode(contarsi)
                                         self.addNodeC(node0, node1)
@@ -541,9 +522,7 @@ class Sintáctico:
                                         self.addNodeC(node14, node8)
                                         self.addNodeC(node14, node10)
                                         self.addNodeC(node14, node12)
-                                        self.addNodeC(self.start, nodeInstruction)
-                                        self.addNodeC(nodeInstruction, node14)
-                                        self.start = nodeInstruction
+                                        self.addNodeC(self.nodeInstruction, node14)
                                 else:
                                     self.tokens.append(temp)
                                     self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -583,33 +562,24 @@ class Sintáctico:
 
                     if temp.type == "Punto y coma":
                         self.impTabla()
-                        nodeInstruction = self.createNode('Instrucción')
-
                         node0 = self.createNode('datos')
                         node1 = self.createNode(data)
                         self.addNodeC(node0, node1)
-
                         node2 = self.createNode('Paréntesis de apertura')
                         node3 = self.createNode(parentesisAp)
                         self.addNodeC(node2, node3)
-
                         node4 = self.createNode('Paréntesis de cierre')
                         node5 = self.createNode(parentesisCi)
                         self.addNodeC(node4, node5)
-
                         node6 = self.createNode('Punto y coma')
                         node7 = self.createNode(temp.lexeme)
                         self.addNodeC(node6, node7)
-
                         node8 = self.createNode('Instrucción - datos')
                         self.addNodeC(node8, node0)
                         self.addNodeC(node8, node2)
                         self.addNodeC(node8, node4)
                         self.addNodeC(node8, node6)
-
-                        self.addNodeC(self.start, nodeInstruction)
-                        self.addNodeC(nodeInstruction, node8)
-                        self.start = nodeInstruction
+                        self.addNodeC(self.nodeInstruction, node8)
                         pass
                     else:
                         self.tokens.append(temp)
@@ -652,7 +622,6 @@ class Sintáctico:
                             else:
                                 self.temporary += "\nsumar (" + cadenaLx + ")"
                                 self.temporary += "\n>>> " + res
-                                nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('sumar')
                                 node1 = self.createNode(sum)
                                 self.addNodeC(node0, node1)
@@ -674,9 +643,7 @@ class Sintáctico:
                                 self.addNodeC(node10, node4)
                                 self.addNodeC(node10, node6)
                                 self.addNodeC(node10, node8)
-                                self.addNodeC(self.start, nodeInstruction)
-                                self.addNodeC(nodeInstruction, node10)
-                                self.start = nodeInstruction
+                                self.addNodeC(self.nodeInstruction, node10)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -721,7 +688,6 @@ class Sintáctico:
                             else:
                                 self.temporary += "\nmax (" + cadenaLx + ")"
                                 self.temporary += "\n>>> " + res
-                                nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('max')
                                 node1 = self.createNode(maximum)
                                 self.addNodeC(node0, node1)
@@ -743,9 +709,7 @@ class Sintáctico:
                                 self.addNodeC(node10, node4)
                                 self.addNodeC(node10, node6)
                                 self.addNodeC(node10, node8)
-                                self.addNodeC(self.start, nodeInstruction)
-                                self.addNodeC(nodeInstruction, node10)
-                                self.start = nodeInstruction
+                                self.addNodeC(self.nodeInstruction, node10)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -789,7 +753,6 @@ class Sintáctico:
                             else:
                                 self.temporary += "\nmin (" + cadenaLx + ")"
                                 self.temporary += "\n>>> " + res
-                                nodeInstruction = self.createNode('Instrucción')
                                 node0 = self.createNode('min')
                                 node1 = self.createNode(minimum)
                                 self.addNodeC(node0, node1)
@@ -811,9 +774,7 @@ class Sintáctico:
                                 self.addNodeC(node10, node4)
                                 self.addNodeC(node10, node6)
                                 self.addNodeC(node10, node8)
-                                self.addNodeC(self.start, nodeInstruction)
-                                self.addNodeC(nodeInstruction, node10)
-                                self.start = nodeInstruction
+                                self.addNodeC(self.nodeInstruction, node10)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)
@@ -854,7 +815,6 @@ class Sintáctico:
                         if temp.type == "Punto y coma":
                             report = self.reportHTML.reportHTML(cadena, self.keys, self.vector)
                             self.temporary += report
-                            nodeInstruction = self.createNode('Instrucción')
                             node0 = self.createNode('exportarReporte')
                             node1 = self.createNode(report)
                             self.addNodeC(node0, node1)
@@ -876,9 +836,7 @@ class Sintáctico:
                             self.addNodeC(node10, node4)
                             self.addNodeC(node10, node6)
                             self.addNodeC(node10, node8)
-                            self.addNodeC(self.start, nodeInstruction)
-                            self.addNodeC(nodeInstruction, node10)
-                            self.start = nodeInstruction
+                            self.addNodeC(self.nodeInstruction, node10)
                         else:
                             self.tokens.append(temp)
                             self.addError(temp.type, "Punto y coma", temp.row, temp.column)

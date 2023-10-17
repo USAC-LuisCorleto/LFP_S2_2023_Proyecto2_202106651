@@ -1,17 +1,11 @@
 class ContarSi:
     def contarSi(self, records, keys, field, value):
-        cadena = field.replace('"', '')
-        count = 0
-        large = len(records)
-
-        for valu in keys:
-            if str(valu) == str(cadena):
-                suma = 0
-                i = 0
-                while large>i:
-                    if records[i][count] == str(value).replace('"', ''):
-                        suma += 1
-                    i += 1
-                return str(suma)
-            count += 1
-        return None
+        field = field.replace('"', '')
+        
+        try:
+            index = keys.index(field)
+        except ValueError:
+            return None
+        
+        count = sum(1 for record in records if str(record[index]) == str(value).replace('"', ''))
+        return str(count)
