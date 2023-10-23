@@ -5,69 +5,77 @@ class reportMistakes():
         pass
 
     def reportMistakes(self, mistakesTable):
-        html =  """<!doctype html>
-                    <html lang="en">
-                    <head>
-                    <!-- Required meta tags -->
+        html = """<!DOCTYPE html>
+                <html lang="en">
+                <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-                    <!-- Bootstrap CSS -->
-                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+                    <title>Reporte de Errores</title>
                     <style>
                         body {
-                            margin: 20px;
-                            background-color: #2E2E2E; 
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, sans-serif;
+                            background-color: #f2f2f2;
+                        }
+
+                        header {
+                            background-color: #333;
+                            color: #fff;
+                            text-align: center;
+                            padding: 20px;
                         }
 
                         h1 {
-                            text-align: center;
-                            margin-bottom: 20px;
-                            color: #FFFFFF;
+                            font-size: 24px;
                         }
 
                         table {
-                            height: 108px;
-                            width: 60%;
+                            width: 80%;
+                            margin: 20px auto;
+                            background-color: #fff;
                             border-collapse: collapse;
-                            margin-left: auto;
-                            margin-right: auto;
+                            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
                         }
 
                         th, td {
-                            height: 18px;
                             text-align: center;
-                            padding: 8px;
+                            padding: 12px;
+                            border: 1px solid #ddd;
+                        }
+
+                        th {
+                            background-color: #333;
+                            color: #fff;
+                        }
+
+                        tr:nth-child(even) {
+                            background-color: #f2f2f2;
                         }
                     </style>
+                </head>
+                <body>
+                <header>
+                    <h1>Reporte de Errores</h1>
+                </header>
 
-                    <title>Reportes</title>
-                    </head>
-                    <body>
-                
-                    &nbsp;
-                    <h1 style="text-align: center;">Reporte de Errores</h1>
-                    &nbsp;                    
-
-                    <table class="table table-hover table-dark">
+                <table>
                     <thead>
-                    <tr style="height: 18px;">
-                    <th><strong>Error</strong></th>
-                    </tr>
+                        <tr>
+                            <th><strong>Error</strong></th>
+                        </tr>
                     </thead>
                     <tbody>
                     """
-
         for error in mistakesTable:
-            
-            html += """<tr style="height: 18px;">
-                    <td>""" + str(error).replace("<", "&#60;").replace(">", "&#62;") +"""</span></td>
+            html += """<tr>
+                    <td>""" + str(error).replace("<", "&lt;").replace(">", "&gt;") + """</td>
                     </tr>"""
         html += """ 
                 </tbody>
                 </table>
-                <p>&nbsp;</p>
-        """
+                </body>
+                </html>"""
         current_dir = os.getcwd()
         file_path = os.path.join(current_dir, "Errores.html")
         with open(file_path, "w+", encoding="utf-8") as archivo:

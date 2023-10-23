@@ -100,7 +100,6 @@ class Léxico:
                 else:
                     self.temporary += cadena[self.i]
                     self.addError(self.temporary, self.row, self.column)
-                    print("Else estado 0")
                     self.column += 1
 
             elif self.state == 1:
@@ -116,7 +115,6 @@ class Léxico:
                     else:
                         self.addError(self.temporary, self.row, self.column)
                         self.state = 0
-                        print("Else estado 1")
                         self.column += 1
                         self.i -= 1
 
@@ -223,23 +221,3 @@ class Léxico:
 
             self.i += 1
         return self.tokensTable, self.mistakes
-    
-    def printTokens(self):
-        print("-" * 175)
-        print("{:<50} {:<75} {:<55} {:<20}".format("Lexema", "Tipo", "Fila", "Columna"))
-        print("-" * 175)
-        for token in self.tokensTable:
-            token.print()
-
-    def impTokens(self):
-        print("Lexema\tToken\tFila\tColumna")
-        for i in self.tokensTable:
-            print("\t".join(map(str, i.sent())))
-
-    def impErrores(self):
-        if len(self.mistakesTable) == 0:
-            print('No hay errores')
-        else:
-            print("Descripcion\tFila\tColumna")
-            for i in self.mistakesTable:
-                print("\t".join(map(str, i.sent())))

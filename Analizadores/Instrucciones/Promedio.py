@@ -1,25 +1,22 @@
 class Promedio:
     def promedio(self, records, keys, field):
         cadena = field.replace('"', '')
-        count = 0
-        large = len(records)
+        count = keys.index(cadena) if cadena in keys else -1
 
-        if cadena not in keys:
+        if count == -1:
             return "0"
-        for value in keys:
-            if value == cadena:
-                suma = 0
-                i = 0
-                while large > i:
-                    try:
-                        suma += float(records[i][count])
-                        i += 1
-                    except ValueError:
-                        return "No se puede promediar un string."
-                if i > 0:
-                    total = float(suma) / float(i)
-                    return str(round(total, 2))
-                else:
-                    return "No es posible la división por 0"
-            count += 1
-        return "0"
+
+        suma = 0
+        i = 0
+        for record in records:
+            try:
+                suma += float(record[count])
+                i += 1
+            except ValueError:
+                return "No se puede promediar un string."
+
+        if i == 0:
+            return "No es posible la división por 0"
+
+        total = suma / i
+        return str(round(total, 2))

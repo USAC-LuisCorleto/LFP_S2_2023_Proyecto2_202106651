@@ -24,27 +24,27 @@ class Sintáctico:
         self.reportHTML = reportHtml()
         self.temporary = ""
         self.graph = Digraph('Arbol de derivación', format='png')
-        self.graph.attr(bgcolor='lightyellow', fontname='Arial', fontsize='12', rankdir='TB')
+        self.graph.attr(bgcolor='white', fontname='Helvetica', fontsize='12', rankdir='TB')
+        self.graph.attr('node', shape='rectangle', style='filled', color='lightgray', fontcolor='black')
         self.start = ""
         self.nodeInstruction = ""
 
     def createNode(self, tag:str) -> str:
         id = str(uuid.uuid1())
-        self.graph.node(id, tag, shape='box', style='filled', color='lightblue')
+        self.graph.node(id, tag, color='gray')
         return id
     
     def addNodeC(self, parentNode, childNode:str):
-        self.graph.edge(parentNode, childNode, color='red', penwidth='2.0')
+        self.graph.edge(parentNode, childNode, color='black')
 
     def addError(self, obtained, expected, row, column):
-        self.mistakes.append(f"[ERROR SINTÁCTICO] Encontrado: '{obtained}', Se esperaba: '{expected}'. [Fila: {row}, Columna: {column}")
+        self.mistakes.append(f"[ERROR SINTÁCTICO] Encontrado: '{obtained}', Se esperaba: '{expected}'. Fila: {row}, Columna: {column}")
         temp = self.tokens[-1]
         while temp.type.upper() not in self.reserved:
             temp = self.tokens.pop()
 
     def analyze(self):
         self.startAn()
-        self.impErrores()
         return(self.temporary, self.mistakes, self.graph)
     
     def startAn(self):
@@ -73,9 +73,7 @@ class Sintáctico:
                 self.instructionsAn2()
         except IndexError:
             pass
-        except Exception as e:
-            print("Error en instructionsAnode2")
-            print(f"Error {e}")
+        except Exception:
             pass
 
     def instructionAn(self):
@@ -109,9 +107,7 @@ class Sintáctico:
                 pass
         except IndexError:
             pass
-        except Exception as e:
-            print("Error en instructionAn")
-            print(f"Error {e}")
+        except Exception:
             pass
     
     def printAn(self):
@@ -917,9 +913,3 @@ class Sintáctico:
         else:
             table_data = [self.keys] + self.vector
             self.temporary += '\n' + tabulate(table_data, headers='firstrow', tablefmt='fancy_grid') + '\n'
-
-    def impErrores(self):
-        if len(self.mistakes) == 0:
-            self.temporary += '\nNo hay errores en la lista.\n'
-        else:
-            self.temporary += '\n' + tabulate([[value] for value in self.mistakes], headers=['Errores'], tablefmt='fancy_grid') + '\n'

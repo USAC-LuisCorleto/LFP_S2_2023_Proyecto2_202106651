@@ -10,54 +10,66 @@ class reportHtml:
                     <html lang="en">
                     <head>
                     <meta charset="utf-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
                     <title>Reporte</title>
-
-                    <!-- Bootstrap CSS -->
-                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-                    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+                    
                     <style>
                         body {
-                            margin: 20px;
-                            background-color: #2E2E2E; 
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, sans-serif;
+                            background-color: #f2f2f2;
+                        }
+
+                        header {
+                            background-color: #333;
+                            color: #fff;
+                            text-align: center;
+                            padding: 20px;
                         }
 
                         h1 {
-                            text-align: center;
-                            margin-bottom: 20px;
-                            color: #FFFFFF;
+                            font-size: 24px;
                         }
 
                         table {
-                            height: 108px;
-                            width: 60%;
+                            width: 80%;
+                            margin: 20px auto;
+                            background-color: #fff;
                             border-collapse: collapse;
-                            margin-left: auto;
-                            margin-right: auto;
+                            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
                         }
 
                         th, td {
-                            height: 18px;
                             text-align: center;
-                            padding: 8px;
+                            padding: 12px;
+                            border: 1px solid #ddd;
                         }
-                    
+
+                        th {
+                            background-color: #333;
+                            color: #fff;
+                        }
+
+                        tr:nth-child(even) {
+                            background-color: #f2f2f2;
+                        }
                     </style>
-                    
                     </head>
                     <body>
-                    <h1>""" + str(title) + """</h1>
-
-                    <table class="table table-hover table-dark">
-                    <thead>
-                    <tr>"""
+                    <header>
+                        <h1>""" + str(title) + """</h1>
+                    </header>
+                    
+                    <table>
+                        <thead>
+                            <tr>"""
         for record in records:
             html += '<th>' + str(record) + '</th>'
         html += """ </tr>
-                    </thead>
-                    <tbody>
-                    """
+                        </thead>
+                        <tbody>
+                        """
         for row in keys:
             html += """<tr>"""
             for column in row:

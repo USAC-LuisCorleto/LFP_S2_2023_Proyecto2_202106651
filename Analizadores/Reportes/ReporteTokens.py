@@ -5,72 +5,83 @@ class reportTokens:
         pass
 
     def reportTokens(self, tokensTable):
-        html =  """<!doctype html>
-                    <html lang="en">
-                    <head>
-                    <!-- Required meta tags -->
+        html = """<!DOCTYPE html>
+                <html lang="en">
+                <head>
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-                    <!-- Bootstrap CSS -->
-                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+                    <title>Reporte de Tokens</title>
                     <style>
                         body {
-                            margin: 20px;
-                            background-color: #2E2E2E; 
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, sans-serif;
+                            background-color: #f2f2f2;
+                        }
+
+                        header {
+                            background-color: #333;
+                            color: #fff;
+                            text-align: center;
+                            padding: 20px;
                         }
 
                         h1 {
-                            text-align: center;
-                            margin-bottom: 20px;
-                            color: #FFFFFF;
+                            font-size: 24px;
                         }
 
                         table {
-                            height: 108px;
-                            width: 60%;
+                            width: 80%;
+                            margin: 20px auto;
+                            background-color: #fff;
                             border-collapse: collapse;
-                            margin-left: auto;
-                            margin-right: auto;
+                            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
                         }
 
                         th, td {
-                            height: 18px;
                             text-align: center;
-                            padding: 8px;
+                            padding: 12px;
+                            border: 1px solid #ddd;
+                        }
+
+                        th {
+                            background-color: #333;
+                            color: #fff;
+                        }
+
+                        tr:nth-child(even) {
+                            background-color: #f2f2f2;
                         }
                     </style>
-                    <title>Reportes</title>
-                    </head>
-                    <body>
-                
-                    &nbsp;
-                    <h1 style="text-align: center;">Reporte de Tokens</h1>
-                    &nbsp;                 
+                </head>
+                <body>
+                <header>
+                    <h1>Reporte de Tokens</h1>
+                </header>
 
-                    <table class="table table-hover table-dark">
+                <table>
                     <thead>
-                    <tr style="height: 18px;">
-                    <th><strong>Token</strong></th>
-                    <th><strong>Tipo</strong></th>
-                    <th><strong>Linea</strong></th>
-                    <th><strong>Columna</strong></th>
-                    </tr>
+                        <tr>
+                            <th><strong>Token</strong></th>
+                            <th><strong>Tipo</strong></th>
+                            <th><strong>Línea</strong></th>
+                            <th><strong>Columna</strong></th>
+                        </tr>
                     </thead>
                     <tbody>
                     """
         for token in tokensTable:
-            html += """<tr style="height: 18px;">
-                    <td>""" + str(token.lexeme) +"""</span></td>
-                    <td>""" + str(token.type) +"""</td>
-                    <td>""" + str(token.row) +"""</td>
-                    <td>""" + str(token.column) +"""</td>
+            html += """<tr>
+                    <td>""" + str(token.lexeme) + """</td>
+                    <td>""" + str(token.type) + """</td>
+                    <td>""" + str(token.row) + """</td>
+                    <td>""" + str(token.column) + """</td>
                     </tr>"""
         html += """ 
                 </tbody>
                 </table>
-                <p>&nbsp;</p>
-        """
+                </body>
+                </html>"""
         current_dir = os.getcwd()
         file_path = os.path.join(current_dir, "Reporte Tokens.html")
         with open(file_path, "w+", encoding="utf-8") as archivo:

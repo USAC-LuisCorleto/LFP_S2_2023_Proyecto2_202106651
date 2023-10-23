@@ -111,7 +111,6 @@ class Interfaz:
 
             parser = Sintáctico(listPars[0], listPars[1])
             self.tokensTable = copy.deepcopy(listPars[0])
-            analyzeLéxico.printTokens()
             output = parser.analyze()
             messagebox.showinfo("Archivo analizado", "Se ha analizado el archivo correctamente.")
             self.area_consola.insert(tk.END, output[0])
@@ -119,8 +118,9 @@ class Interfaz:
             self.tree = output[2]
             self.archivo_analizado = True
             self.area_consola.configure(state="disabled")
-        except:
+        except Exception as e:
             messagebox.showerror("Error", "No se pudo analizar el archivo.")
+            print(e)
     
     def botónGuardar(self):
         if not self.ruta:
