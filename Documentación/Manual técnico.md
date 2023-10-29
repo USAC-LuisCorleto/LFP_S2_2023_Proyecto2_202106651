@@ -1,3 +1,248 @@
+#MANUAL TÉCNICO
+##Luis Carlos Corleto Marroquín
+###Proyecto 2 - BizData
+**OBJETIVOS**
+* Que el estudiante implemente una solución de software, implementando los conceptos vistos en clase y laboratorio.
+* Que el estudiante implemente un analizador sintáctico utilizando los conceptos de
+gramáticas independientes de contexto y árboles de derivación.
+* Introducir al estudiante a la ejecución de instrucciones en un lenguaje de programación.
+###DESCRIPCIÓN
+BizData (Business Data Analysis) es una plataforma diseñada para que las pequeñas empresas 
+puedan tomar decisiones fundamentadas y estratégicas basadas en el análisis profundo de sus 
+datos comerciales. La tarea del estudiante de Lenguajes Formales y de Programación es crear 
+un analizador léxico y sintáctico, utilizando Python, que permita a las empresas cargar y analizar 
+datos estructurados en un formato especializado con extensión “.bizdata”.
+###ANALIZADOR LÉXICO:
+####Expresiones regulares
+1. Identificadores(Tokens Alfabéticos):
+    * Expresión: [a-zA-Z]+
+2. Números enteros:
+    * Expresión: [0-9]+
+3. Números decimales:
+    * Expresión: [0-9]+\.[0-9]+
+4. Cadenas:
+    * Expresión: ([^"]*)"
+5. Comentarios de una sola línea:
+    * Expresión: #.*\n
+6. Caracteres entre comillas simples:
+    * '(.)'
+####Método del Árbol
+####AFD
+![Imágen 7](Images/7.png)
+```
+    def analyzer(self, cadena):
+        self.tokensTable = []
+        self.mistakesTable = []
+        self.i = 0
+
+        while self.i < len(cadena):
+            if self.state == 0:
+                if cadena[self.i].isalpha():
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                    self.state = 1
+                
+                elif cadena[self.i].isdigit():
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                    self.state = 2
+
+                elif cadena[self.i] in self.symbols:
+                    self.identifySymbol(cadena[self.i])
+                
+                elif cadena[self.i] == '"':
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                    self.state = 5
+
+                elif cadena[self.i] == '#':
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                    self.state = 7
+
+                elif cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                    self.state = 9
+                
+                elif cadena[self.i] == '\n':
+                    self.row += 1
+                    self.column = 1
+
+                elif cadena[self.i] in ['\t', ' ']:
+                    self.column += 1
+
+                elif cadena[self.i] == '\r':
+                    pass
+
+                else:
+                    self.temporary += cadena[self.i]
+                    self.addError(self.temporary, self.row, self.column)
+                    self.column += 1
+
+            elif self.state == 1:
+                if cadena[self.i].isalpha():
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                else:
+                    if self.identifyReserved():
+                        self.addToken(self.temporary.strip(), self.temporary.strip(), self.row, self.column)
+                        self.state = 0
+                        self.column += 1
+                        self.i -=1
+                    else:
+                        self.addError(self.temporary, self.row, self.column)
+                        self.state = 0
+                        self.column += 1
+                        self.i -= 1
+
+            elif self.state == 2:
+                if cadena[self.i].isdigit():
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+
+                elif cadena[self.i] == ".":
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                    self.state = 3
+
+                else:
+                    self.addToken(self.temporary, 'Entero', self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+                    self.i -= 1
+
+            elif self.state == 3:
+                if cadena[self.i].isdigit():
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                else:
+                    self.addToken(self.temporary, 'Decimal', self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+                    self.i -= 1
+            
+            elif self.state == 5:
+                if cadena[self.i] != "\"":
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+                else:
+                    self.temporary += cadena[self.i]
+                    self.addToken(self.temporary, "Cadena", self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+
+            elif self.state == 7:
+                if cadena[self.i] == '\n':
+                    self.state = 0
+                    self.row += 1
+                    self.column = 1
+                else:
+                    self.column += 1
+
+            elif self.state == 9:
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
+                    self.state = 10
+                    self.column += 1
+                else:
+                    self.addError(self.temporary, self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+                    self.i -= 1
+
+            elif self.state == 10:
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
+                    self.state = 11
+                    self.column += 1
+                else:
+                    self.addError(self.temporary, self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+                    self.i -= 1
+            
+            elif self.state == 11:
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
+                    self.state = 12
+                    self.column += 1
+                elif cadena[self.i] == '\n':
+                    self.temporary += cadena[self.i]
+                    self.row += 1
+                    self.column = 1
+                else:
+                    self.temporary += cadena[self.i]
+                    self.column += 1
+            
+            elif self.state == 12:
+                if cadena[self.i] == "'":
+                    self.temporary += cadena[self.i]
+                    self.state = 13
+                    self.column += 1
+                else:
+                    self.addError(self.temporary, self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+                    self.i -= 1
+
+            elif self.state == 13:
+                if cadena[self.i] == "'":
+                    self.temporary = ""
+                    self.state = 0
+                    self.column += 1
+                else:
+                    self.addError(self.temporary, self.row, self.column)
+                    self.state = 0
+                    self.column += 1
+                    self.i -= 1
+
+            self.i += 1
+        return self.tokensTable, self.mistakes
+```
+####Gramática independiente del contexto
+S -> INSTRUCCIONES
+INSTRUCCIONES -> INSTRUCCION INSTRUCCIONES 
+               | ε
+INSTRUCCION -> IMPRIMIR 
+            | IMPRIMIRLN
+            | CLAVES
+            | REGISTROS
+            | CONTEO
+            | PROMEDIO
+            | CONTARSI
+            | DATOS
+            | SUMAR
+            | MAX
+            | MIN
+            | REPORTE
+            
+IMPRIMIR -> imprimir ( CADENA ) ;
+IMPRIMIRLN -> imprimirln ( CADENA ) ;
+CLAVES -> Claves = [ CADENAS ] ;  
+REGISTROS -> Registros = [ REGISTROS ] ;
+REGISTROS -> { VALORES }
+VALORES -> VALOR , VALORES
+       | VALOR
+VALOR -> CADENA
+     | ENTERO
+     | DECIMAL
+CONTEO -> conteo ( ) ;
+PROMEDIO -> promedio ( CADENA ) ;
+CONTARSI -> contarsi ( CADENA , VALOR ) ;
+DATOS -> datos ( ) ;  
+SUMAR -> sumar ( CADENA ) ;
+MAX -> max ( CADENA ) ;
+MIN -> min ( CADENA ) ;
+REPORTE -> exportarReporte ( CADENA ) ;
+
+CADENAS -> CADENA , CADENAS
+        | CADENA
+CADENA -> " CADENA "
+ENTERO -> DIGITO+
+DECIMAL -> DIGITO+ . DIGITO+
+###ANALIZADOR SINTÁCTICO
+```
 from graphviz import Digraph
 from Instrucciones.ContarSi import ContarSi
 from Instrucciones.Max import Max
@@ -917,3 +1162,344 @@ class Sintáctico:
             for row in self.vector:
                 table.add_row(row)
             self.temporary += '\n' + table.draw() + '\n'
+```
+La función comienza inicializando las variables field y value como None y luego toma el token actual de la lista self.tokens y lo almacena en la variable temp.
+
+Comprueba si el tipo del token en temp es igual a "contarsi". Si no lo es, se coloca el token nuevamente en la lista self.tokens y se agrega un error al registro de errores. Luego, la función sale.
+
+Luego, la función verifica si el siguiente token es un "Paréntesis de apertura". Si no lo es, nuevamente coloca el token en la lista self.tokens y agrega un error al registro de errores antes de salir.
+
+La función procede a verificar si el siguiente token es una "Cadena" y almacena su valor en las variables cadena1 y field.
+
+Luego, se verifica si el siguiente token es una coma (","). Si no lo es, se maneja de manera similar como los pasos anteriores, agregando el token nuevamente y registrando un error.
+
+La función verifica si el token siguiente es una "Cadena", "Decimal" o "Entero". Si no es ninguno de estos tipos, coloca el token en la lista y agrega un error.
+
+Después, se verifica si el siguiente token es un "Paréntesis de cierre". De lo contrario, se coloca el token en la lista y se agrega un error.
+
+Finalmente, la función verifica si el siguiente token es un "Punto y coma". Si no lo es, el token se coloca en la lista y se agrega un error.
+
+Después de todas estas comprobaciones, se realiza un cálculo utilizando la función self.functionContarSi.contarSi y se almacena el resultado en la variable res.
+
+Dependiendo de si res es None o no, se imprime un mensaje de error o se construye una cadena en la variable self.temporary.
+
+Se crean nodos para construir un árbol sintáctico o similar, y se almacenan en variables como node0, node1, etc., utilizando la función self.createNode. Luego, estos nodos se enlazan para representar la estructura de la instrucción.
+
+Finalmente, se agrega un nodo de instrucción a la estructura de árbol self.nodeInstruction, que parece ser parte de un analizador más grande.
+###FUNCIONES
+Se coloca una función como ejemplo.
+####Función promedio
+```
+class Suma:
+    def sumar(self, records, keys, field):
+        field = field.replace('"', '')
+
+        try:
+            index = keys.index(field)
+        except ValueError:
+            return None
+
+        suma = 0
+        for record in records:
+            try:
+                suma += float(record[index])
+            except (ValueError, TypeError):
+                return "No se pueden sumar valores no numéricos."
+
+        return str(round(suma, 2))
+```
+Elimina las comillas dobles (") del valor del campo field.
+
+Intenta encontrar el índice de field en la lista keys. Si field no se encuentra en keys, devuelve None.
+
+Inicializa una variable llamada suma en cero.
+
+Luego, realiza un bucle a través de los elementos en la lista records. En cada iteración, intenta sumar el valor numérico correspondiente al campo field (identificado por el índice) al valor acumulado en suma. Si el valor no es numérico (se produce una excepción de tipo ValueError o TypeError), se devuelve un mensaje de error.
+
+Al final, el método devuelve la suma total de los valores numéricos en records redondeada a dos decimales como una cadena, o un mensaje de error si hubo problemas durante la suma.
+###REPORTES
+Se coloca un reporte como ejemplo:
+```
+import os
+
+class reportMistakes():
+    def __init__(self):
+        pass
+
+    def reportMistakes(self, mistakesTable):
+        html = """<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                    <title>Reporte de Errores</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, sans-serif;
+                            background-color: #f2f2f2;
+                        }
+
+                        header {
+                            background-color: #333;
+                            color: #fff;
+                            text-align: center;
+                            padding: 20px;
+                        }
+
+                        h1 {
+                            font-size: 24px;
+                        }
+
+                        table {
+                            width: 80%;
+                            margin: 20px auto;
+                            background-color: #fff;
+                            border-collapse: collapse;
+                            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                        }
+
+                        th, td {
+                            text-align: center;
+                            padding: 12px;
+                            border: 1px solid #ddd;
+                        }
+
+                        th {
+                            background-color: #333;
+                            color: #fff;
+                        }
+
+                        tr:nth-child(even) {
+                            background-color: #f2f2f2;
+                        }
+                    </style>
+                </head>
+                <body>
+                <header>
+                    <h1>Reporte de Errores</h1>
+                </header>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th><strong>Error</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    """
+        for error in mistakesTable:
+            html += """<tr>
+                    <td>""" + str(error).replace("<", "&lt;").replace(">", "&gt;") + """</td>
+                    </tr>"""
+        html += """ 
+                </tbody>
+                </table>
+                </body>
+                </html>"""
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "Errores.html")
+        with open(file_path, "w+", encoding="utf-8") as archivo:
+            archivo.write(html)
+        abs_file_path = os.path.abspath(file_path)
+        return f"\n>>> Se generó el reporte HTML: {abs_file_path}"
+```
+Crea una estructura HTML que contiene un encabezado y una tabla para mostrar los errores. Define estilos básicos en línea para la apariencia de la página.
+
+Luego, itera a través de la lista de errores (mistakesTable) y los agrega a la tabla HTML, escapando los caracteres < y > para que se muestren correctamente en la página.
+
+Después de completar la tabla HTML, el código guarda el HTML generado en un archivo llamado "Errores.html" en el directorio actual.
+
+Retorna un mensaje que indica que se ha generado con éxito el reporte HTML y proporciona la ruta absoluta al archivo generado.
+###APLICACIÓN (Interfaz)
+```
+import tkinter as tk
+from tkinter import *
+from tkinter import filedialog
+from tkinter import messagebox
+from tkinter import Text
+from Reportes.ReporteErrores import reportMistakes
+from Reportes.ReporteTokens import reportTokens
+from AnalizadorLéxico import *
+from AnalizadorSintáctico import *
+import os, webbrowser
+
+bg_color = "#2E2E2E"
+fg_color = "#FFFFFF" 
+
+reportError = reportMistakes()
+ReporteTokens = reportTokens()
+
+class Interfaz:
+    def __init__(self):
+        self.ventana = Tk()
+        self.ventana.title("Analizador")
+        self.ventana.config(bg=bg_color)
+        self.fuente1 = ("Helvetica", 9)
+        self.fuente2 = ("Helvetica", 12)
+        self.area_texto = Text(self.ventana, font=self.fuente1)
+        self.area_consola = Text(self.ventana, font=self.fuente1)
+        self.area_texto.grid(row=0, column=0, padx=10, pady=10)
+        self.area_consola.grid(row=0, column=1, padx=10, pady=10)
+        self.archivo_analizado = False
+        self.archivo_analizado = False
+        self.ruta = ''
+        self.contenido = ''
+        self.mistakesTable = []
+        self.tokensTable = []
+        self.tree = None
+
+    def ventana_principal(self):
+        self.ventana.title('BizData')
+        self.centrar_ventana()
+        self.ventana.resizable(False, False)
+        self.componentes()
+        self.ventana.mainloop()
+
+    def centrar_ventana(self):
+        w, h = 1500, 750
+        w_pantalla = self.ventana.winfo_screenwidth()
+        h_pantalla = self.ventana.winfo_screenheight()
+        x = ((w_pantalla / 2) - (w / 2))
+        y = ((h_pantalla / 2) - (h / 2)) - 50
+        self.ventana.geometry(f'{w}x{h}+{int(x)}+{int(y)}')
+
+    def componentes(self):
+        self.botones()
+        self.editor()
+        self.consola()
+
+    def botones(self):
+
+        cargar = Button(self.ventana, text='Cargar', width=10, height=2, bg="#474747", fg=fg_color, font=self.fuente2, command=self.botónCargar)
+        cargar.place(x=35, y=20)
+
+        analizar = Button(self.ventana, text='Analizar', width=10, height=2, bg="#474747", fg=fg_color, font=self.fuente2, command=self.botónAnalizar)
+        analizar.place(x=140, y=20)
+
+        guardar = Button(self.ventana, text='Guardar', width=10, height=2, bg="#474747", fg=fg_color, font=self.fuente2, command=self.botónGuardar)
+        guardar.place(x=245, y=20)
+
+        token = Button(self.ventana, text='Reporte de tokens', width=15, height=2, bg="#474747", fg=fg_color, font=self.fuente2, command=self.botónReporteTokens)
+        token.place(x=1025, y=20)
+
+        error = Button(self.ventana, text='Reporte de errores', width=15, height=2, bg="#474747", fg=fg_color, font=self.fuente2, command=self.botónReporteErrores)
+        error.place(x=1175, y=20)
+
+        grafica = Button(self.ventana, text='Arbol de derivación', width=15, height=2, bg="#474747", fg=fg_color, font=self.fuente2, command=self.botónGrafo)
+        grafica.place(x=1325, y=20)
+
+    def editor(self):
+        self.area_texto.configure(width=100, height=43)
+        self.area_texto.place(x=35, y=80)
+
+    def consola(self):
+        self.area_consola.configure(bg='black', fg='white', width=100, height=43)
+        self.area_consola.place(x=765, y=80)
+
+    def botónCargar(self):
+        tipos_archivos = [("Archivos .bizdata", "*.bizdata"), ("Todos los archivos", "*.*")]
+        archivo = filedialog.askopenfilename(filetypes=tipos_archivos)
+
+        if archivo:
+            if archivo.endswith(".bizdata"):
+                self.ruta = archivo
+                self.area_texto.delete("1.0", "end")
+                try:
+                    with open(archivo, "r", encoding="utf-8") as document:
+                        contenido = document.read()
+                        self.area_texto.insert("1.0", contenido)
+                except Exception as e:
+                    messagebox.showerror("Error", f"No se pudo cargar el archivo:\n{str(e)}")
+            else:
+                messagebox.showerror("Error", "Seleccione un archivo con extensión .bizdata")
+
+    def botónAnalizar(self):
+        try:
+            if not self.ruta:
+                messagebox.showerror("Error", "Primero debe cargar un archivo.")
+                return
+            
+            text = self.area_texto.get("1.0", "end")
+            analyzeLéxico = Léxico()
+            listPars = analyzeLéxico.analyzer(text)
+
+            parser = Sintáctico(listPars[0], listPars[1])
+            self.tokensTable = copy.deepcopy(listPars[0])
+            output = parser.analyze()
+            messagebox.showinfo("Archivo analizado", "Se ha analizado el archivo correctamente.")
+            self.area_consola.insert(tk.END, output[0])
+            self.mistakesTable = output[1]
+            self.tree = output[2]
+            self.archivo_analizado = True
+            self.area_consola.configure(state="disabled")
+        except Exception as e:
+            messagebox.showerror("Error", "No se pudo analizar el archivo.")
+            print(e)
+    
+    def botónGuardar(self):
+        if not self.ruta:
+            messagebox.showerror("Error", "Primero debe cargar un archivo.")
+            return
+        
+        nuevo_contenido = self.area_texto.get("1.0", "end")
+        
+        try:
+            with open(self.ruta, "w", encoding="utf-8") as document:
+                document.write(nuevo_contenido)
+            messagebox.showinfo("Guardado", "Cambios guardados correctamente.")
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo guardar el archivo:\n{str(e)}")
+
+    def botónReporteTokens(self):
+        if not self.archivo_analizado:
+            messagebox.showerror("Error", "Primero debe analizar un archivo.")
+            return
+        ReporteTokens.reportTokens(reversed(self.tokensTable))
+        self.abrirArchivo("Reporte Tokens.html")
+
+    def botónReporteErrores(self):
+        if not self.archivo_analizado:
+            messagebox.showerror("Error", "Primero debe analizar un archivo.")
+            return
+        reportError.reportMistakes(self.mistakesTable)
+        self.abrirArchivo("Errores.html")
+
+    def botónGrafo(self):
+        if not self.archivo_analizado:
+            messagebox.showerror("Error", "Primero debe analizar un archivo.")
+            return
+        self.tree.view()
+    
+    def abrirArchivo(self, nombreArchivo):
+        try:
+            rutaCompleta = os.path.abspath(nombreArchivo)
+            webbrowser.open("file://" + rutaCompleta)
+        except Exception as ex:
+            messagebox.showerror("Error", f"No se pudo abrir el archivo. Error: {str(ex)}")
+
+app = Interfaz()
+app.ventana_principal()
+```
+La interfaz gráfica utiliza elementos de tkinter para crear ventanas, botones, áreas de texto y consolas.
+
+Permite cargar un archivo con extensión ".bizdata" y muestra su contenido en un área de texto.
+
+Tiene botones para realizar las siguientes acciones:
+
+* Cargar: Permite seleccionar un archivo ".bizdata" y cargar su contenido en el área de texto.
+* Analizar: Realiza un análisis léxico y sintáctico del código fuente en el área de texto. Muestra los resultados en una consola.
+* Guardar: Guarda los cambios realizados en el contenido del archivo.
+* Reporte de Tokens: Genera un informe de tokens y lo muestra en un archivo HTML. Permite abrir el informe en el navegador.
+* Reporte de Errores: Genera un informe de errores léxicos y sintácticos y lo muestra en un archivo HTML. También permite abrir el informe en el navegador.
+* Árbol de Derivación: Genera y muestra un árbol de derivación si el análisis se realizó con éxito.
+El código utiliza clases y métodos para organizar la funcionalidad de la interfaz y los informes de tokens y errores.
+
+La interfaz utiliza estilos de colores definidos para el fondo y el texto.
+
+El código maneja la carga, análisis y generación de informes de archivos de código fuente.
+
+La interfaz es redimensionable y se centra en la ventana del sistema.
+
+
