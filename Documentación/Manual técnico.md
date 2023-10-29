@@ -1,19 +1,19 @@
-#MANUAL TÉCNICO
-##Luis Carlos Corleto Marroquín
-###Proyecto 2 - BizData
+# MANUAL TÉCNICO
+## Luis Carlos Corleto Marroquín
+### Proyecto 2 - BizData
 **OBJETIVOS**
 * Que el estudiante implemente una solución de software, implementando los conceptos vistos en clase y laboratorio.
 * Que el estudiante implemente un analizador sintáctico utilizando los conceptos de
 gramáticas independientes de contexto y árboles de derivación.
 * Introducir al estudiante a la ejecución de instrucciones en un lenguaje de programación.
-###DESCRIPCIÓN
+### DESCRIPCIÓN
 BizData (Business Data Analysis) es una plataforma diseñada para que las pequeñas empresas 
 puedan tomar decisiones fundamentadas y estratégicas basadas en el análisis profundo de sus 
 datos comerciales. La tarea del estudiante de Lenguajes Formales y de Programación es crear 
 un analizador léxico y sintáctico, utilizando Python, que permita a las empresas cargar y analizar 
 datos estructurados en un formato especializado con extensión “.bizdata”.
-###ANALIZADOR LÉXICO:
-####Expresiones regulares
+### ANALIZADOR LÉXICO:
+#### Expresiones regulares
 1. Identificadores(Tokens Alfabéticos):
     * Expresión: [a-zA-Z]+
 2. Números enteros:
@@ -26,8 +26,8 @@ datos estructurados en un formato especializado con extensión “.bizdata”.
     * Expresión: #.*\n
 6. Caracteres entre comillas simples:
     * '(.)'
-####Método del Árbol
-####AFD
+#### Método del Árbol
+#### AFD
 ![Imágen 7](Images/7.png)
 ```
     def analyzer(self, cadena):
@@ -200,7 +200,7 @@ datos estructurados en un formato especializado con extensión “.bizdata”.
             self.i += 1
         return self.tokensTable, self.mistakes
 ```
-####Gramática independiente del contexto
+#### Gramática independiente del contexto
 S -> INSTRUCCIONES
 INSTRUCCIONES -> INSTRUCCION INSTRUCCIONES 
                | ε
@@ -217,7 +217,7 @@ INSTRUCCION -> IMPRIMIR
             | MIN
             | REPORTE
             
-IMPRIMIR -> imprimir ( CADENA ) ;
+IMPRIMIR -> imprimir ( CADENA ) ; 
 IMPRIMIRLN -> imprimirln ( CADENA ) ;
 CLAVES -> Claves = [ CADENAS ] ;  
 REGISTROS -> Registros = [ REGISTROS ] ;
@@ -241,7 +241,7 @@ CADENAS -> CADENA , CADENAS
 CADENA -> " CADENA "
 ENTERO -> DIGITO+
 DECIMAL -> DIGITO+ . DIGITO+
-###ANALIZADOR SINTÁCTICO
+### ANALIZADOR SINTÁCTICO
 ```
 from graphviz import Digraph
 from Instrucciones.ContarSi import ContarSi
@@ -1186,9 +1186,9 @@ Dependiendo de si res es None o no, se imprime un mensaje de error o se construy
 Se crean nodos para construir un árbol sintáctico o similar, y se almacenan en variables como node0, node1, etc., utilizando la función self.createNode. Luego, estos nodos se enlazan para representar la estructura de la instrucción.
 
 Finalmente, se agrega un nodo de instrucción a la estructura de árbol self.nodeInstruction, que parece ser parte de un analizador más grande.
-###FUNCIONES
+### FUNCIONES
 Se coloca una función como ejemplo.
-####Función promedio
+#### Función promedio
 ```
 class Suma:
     def sumar(self, records, keys, field):
@@ -1217,7 +1217,7 @@ Inicializa una variable llamada suma en cero.
 Luego, realiza un bucle a través de los elementos en la lista records. En cada iteración, intenta sumar el valor numérico correspondiente al campo field (identificado por el índice) al valor acumulado en suma. Si el valor no es numérico (se produce una excepción de tipo ValueError o TypeError), se devuelve un mensaje de error.
 
 Al final, el método devuelve la suma total de los valores numéricos en records redondeada a dos decimales como una cadena, o un mensaje de error si hubo problemas durante la suma.
-###REPORTES
+### REPORTES
 Se coloca un reporte como ejemplo:
 ```
 import os
@@ -1312,7 +1312,7 @@ Luego, itera a través de la lista de errores (mistakesTable) y los agrega a la 
 Después de completar la tabla HTML, el código guarda el HTML generado en un archivo llamado "Errores.html" en el directorio actual.
 
 Retorna un mensaje que indica que se ha generado con éxito el reporte HTML y proporciona la ruta absoluta al archivo generado.
-###APLICACIÓN (Interfaz)
+### APLICACIÓN (Interfaz)
 ```
 import tkinter as tk
 from tkinter import *

@@ -1,7 +1,7 @@
-#MANUAL DE USUARIO
-##Luis Carlos Corleto Marroquín
-###Proyecto 2 - BizData
-####Menú principal
+# MANUAL DE USUARIO
+## Luis Carlos Corleto Marroquín
+### Proyecto 2 - BizData
+#### Menú principal
 ![Imágen 1](Images/1.jpeg)
 La aplicación cuenta con esta interfaz, en donde el usuario podrá interactuar para la analización de su archivo .bizdata.
 La interfaz minimalista, formal y moderna hacer que sea fácil de entender, esta cuenta con 6 botones funcionales, 1 cuadro de texto y 1 cuadro de consola que no es editable, simplemente muestra los resultados.
