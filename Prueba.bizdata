@@ -5,16 +5,18 @@
 '''
 +
 Claves = [
-	"codigo", "producto", "precio_compra", "precio_venta", "stock"
+	"codigo", "producto", "precio_compra", "precio_venta", "stock", "vendidos"
 ]
 
 Registros = [ 
-	{1, "Barbacoa", 10.50, 20.00, 6}
-	{2, "Barbacoa", 13.00, 16.00, 7}
-	{3, "Mayonesa", 15.00, 18.00, 8}
-	{4, "Mostaza", 14.00, 16.00, 4}
+	{1, "Barbacoa", 10.50, 20.00, 6, 15}
+	{2, "Mouse", 13.00, 16.00, 7, 172}
+	{3, "Mayonesa", 15.00, 18.00, 8, 350}
+	{4, "Mostaza", 14.00, 16.00, 4, 285}
+	{5, "Teclados", 25.00, 20.15, 25, 160}
 ]
 
++
 imprimir("Reporte de ");
 imprimir("Abarrotería");
 
@@ -24,22 +26,29 @@ imprimirln("y adiós");
 conteo();
 
 promedio("stock");
+promedio("vendidos");
+prom:
 
 contarsi("producto", "Barbacoa");
 contarsi("stock", 6);
 contarsi("stock", 8);
+contarsi("vendidos", 350);
 
 datos();
 
 sumar("stock");
 
 max("precio_venta");
+max("codigo");
+max("producto");
+maxx
 
 min("precio_compra");
+min("vendidos");
 
 exportarReporte("Reporte HTML de abarrotería");
 -
-contarsi(;
-
+contarsi(;--
+contarno()
 
 

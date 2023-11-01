@@ -239,42 +239,73 @@ class Sintáctico:
     def keysAn(self):
         rowTemp = []
         temp = self.tokens.pop()
-        
+
         if temp.type != "Claves":
             self.tokens.append(temp)
             self.addError(temp.type, "Error", temp.row, temp.column)
             return
-        
+
+        node0 = self.createNode('[INSTRUCCIÓN] - Claves[]')
+        node1 = self.createNode(temp.lexeme)
+        node11 = self.createNode('Claves')
+        self.addNodeC(node0, node11)
+        self.addNodeC(self.nodeInstruction, node0)
+        self.addNodeC(node11, node1)  
+
         temp = self.tokens.pop()
         if temp.type != "Igual":
             self.tokens.append(temp)
             self.addError(temp.type, "Igual", temp.row, temp.column)
             return
-        
+
+        node2 = self.createNode('Igual')
+        node3 = self.createNode(temp.lexeme)
+        self.addNodeC(node2, node3)
+        self.addNodeC(node0, node2) 
+
         temp = self.tokens.pop()
         if temp.type != "Corchete de apertura":
             self.tokens.append(temp)
             self.addError(temp.type, "Corchete de apertura", temp.row, temp.column)
             return
+
+        node4 = self.createNode('Corchete de apertura')
+        node5 = self.createNode(temp.lexeme)
         
+        self.addNodeC(node4, node5)
+        self.addNodeC(node0, node4)  
+
         while True:
             temp = self.tokens.pop()
             if temp.type == "Cadena":
                 cadena = temp.lexeme.replace('"', '')
                 rowTemp.append(cadena)
-                
+
+                node8 = self.createNode('Cadena')
+                node12 = self.createNode('Coma')
+                node7 = self.createNode(cadena)
+                node13 = self.createNode(',')
+                self.addNodeC(node0, node8)
+                self.addNodeC(node0, node12)
+                self.addNodeC(node8, node7)
+                self.addNodeC(node12, node13)
+
                 temp = self.tokens.pop()
                 if temp.type == "Corchete de cierre":
+                    node9 = self.createNode('Corchete de cierre')
+                    node10 = self.createNode(temp.lexeme)
                     break
                 elif temp.type != "Coma":
                     self.tokens.append(temp)
-                    self.addError(temp.type, "Punto y coma - Corchete de cierre", temp.row, temp.column)
+                    self.addError(temp.type, "Coma - Corchete de cierre", temp.row, temp.column)
                     break
             else:
                 self.tokens.append(temp)
                 self.addError(temp.type, "Cadena", temp.row, temp.column)
                 break
-        
+
+        self.addNodeC(node0, node9)
+        self.addNodeC(node9, node10)
         self.keys = rowTemp
 
     def recordsAn(self):

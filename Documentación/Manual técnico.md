@@ -202,7 +202,7 @@ datos estructurados en un formato especializado con extensión “.bizdata”.
 ```
 #### Gramática independiente del contexto
 S -> INSTRUCCIONES
-INSTRUCCIONES -> INSTRUCCION INSTRUCCIONES 
+INSTRUCCIONES -> INSTRUCCION
                | ε
 INSTRUCCION -> IMPRIMIR 
             | IMPRIMIRLN
