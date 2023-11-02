@@ -402,8 +402,7 @@ class Sintáctico:
             return
 
         rows = len(self.vector)
-        columns = len(self.vector[0])
-        count = int(rows) * int(columns)
+        count = int(rows)
 
         self.temporary += "\n>>> " + str(count)
 
