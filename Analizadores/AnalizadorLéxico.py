@@ -78,7 +78,6 @@ class Léxico:
                     self.state = 5
 
                 elif cadena[self.i] == '#':
-                    self.temporary += cadena[self.i]
                     self.column += 1
                     self.state = 7
 
