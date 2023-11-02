@@ -405,7 +405,6 @@ class Sintáctico:
         columns = len(self.vector[0])
         count = int(rows) * int(columns)
 
-        self.temporary += "\nconteo()"
         self.temporary += "\n>>> " + str(count)
 
         node0 = self.createNode('conteo')
@@ -474,7 +473,6 @@ class Sintáctico:
         if res is None:
             print("Error")
         else:
-            self.temporary += "\npromedio (" + cadenaLx + ")"
             self.temporary += "\n>>> " + res
 
             node0 = self.createNode('promedio')
@@ -569,7 +567,6 @@ class Sintáctico:
         if res is None:
             print("Error en contarSi")
         else:
-            self.temporary += "\ncontarsi(" + cadena1 + "," + cadena2 + ")"
             self.temporary += "\n>>> " + res
             node0 = self.createNode('contarsi')
             node1 = self.createNode(contarsi)
@@ -703,7 +700,6 @@ class Sintáctico:
         if res is None:
             print("Error en suma")
         else:
-            self.temporary += "\nsumar (" + cadenaLx + ")"
             self.temporary += "\n>>> " + res
 
             node0 = self.createNode('sumar')
@@ -776,7 +772,6 @@ class Sintáctico:
         if res is None:
             print("Error en max")
         else:
-            self.temporary += "\nmax (" + cadenaLx + ")"
             self.temporary += "\n>>> " + res
             node0 = self.createNode('max')
             node1 = self.createNode(maximum)
@@ -846,7 +841,6 @@ class Sintáctico:
         if res is None:
             print("Error en min")
         else:
-            self.temporary += "\nmin (" + cadenaLx + ")"
             self.temporary += "\n>>> " + res
             node0 = self.createNode('min')
             node1 = self.createNode(minimum)
