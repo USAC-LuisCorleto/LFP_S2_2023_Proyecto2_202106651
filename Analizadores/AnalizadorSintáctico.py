@@ -5,7 +5,7 @@ from Instrucciones.Min import Min
 from Instrucciones.Promedio import Promedio
 from Instrucciones.Suma import Suma
 from Reportes.ReporteHTML import reportHtml
-from texttable import Texttable
+from tabulate import tabulate
 import uuid, copy
 
 class Sintáctico:
@@ -942,9 +942,5 @@ class Sintáctico:
         if len(self.keys) == 0 or len(self.vector) == 0:
             self.temporary += '\nNo hay valores en la tabla.\n'
         else:
-            table = Texttable()
-            table.header(self.keys)
-            
-            for row in self.vector:
-                table.add_row(row)
-            self.temporary += '\n' + table.draw() + '\n'
+            table_data = [self.keys] + self.vector
+            self.temporary += '\n' + tabulate(table_data, headers='firstrow', tablefmt='fancy_grid') + '\n'
