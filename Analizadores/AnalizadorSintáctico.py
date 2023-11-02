@@ -197,7 +197,7 @@ class Sintáctico:
         cadenaLx = copy.deepcopy(temp.lexeme)
         cadena = temp.lexeme
         cadena = cadena.replace('"', '')
-        self.temporary += "\n" + cadena
+        self.temporary += "\n" + cadena + "\n"
         temp = self.tokens.pop()
 
         if temp.type != "Paréntesis de cierre":
